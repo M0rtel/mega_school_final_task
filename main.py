@@ -56,10 +56,10 @@ async def predict(body: PredictionRequest):
     try:
         await logger.info(f"Processing prediction request with id: {body.id}")
 
-        # parse context
+        # Парсим ссылки на источники
         context, links = await async_get_context(question=body.query)
 
-        # call model
+        # Ответ модели
         answer, reasoning = await async_get_answer(query=body.query, context=context)
 
         sources: List[HttpUrl] = [HttpUrl(link) for link in links]
