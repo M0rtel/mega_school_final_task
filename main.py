@@ -4,8 +4,8 @@ from typing import List
 from fastapi import FastAPI, HTTPException, Request, Response
 from pydantic import HttpUrl
 from schemas.request import PredictionRequest, PredictionResponse
-from utils.parser import get_context
-from utils.agent import get_answer
+from utils.parser import async_get_context
+from utils.agent import async_get_answer
 from utils.logger import setup_logger
 
 # Initialize
@@ -55,8 +55,13 @@ async def log_requests(request: Request, call_next):
 async def predict(body: PredictionRequest):
     try:
         await logger.info(f"Processing prediction request with id: {body.id}")
-        context, links = get_context(question=body.query)
-        answer, reasoning = get_answer(query=body.query, context=context)
+
+        # parse context
+        context, links = await async_get_context(question=body.query)
+
+        # call model
+        answer, reasoning = await async_get_answer(query=body.query, context=context)
+
         sources: List[HttpUrl] = [HttpUrl(link) for link in links]
 
         response = PredictionResponse(
