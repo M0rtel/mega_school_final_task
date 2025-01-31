@@ -67,7 +67,7 @@ async def predict(body: PredictionRequest):
         response = PredictionResponse(
             id=body.id,
             answer=answer,
-            reasoning="Из информации на сайте",
+            reasoning=reasoning,
             sources=sources,
         )
         await logger.info(f"Successfully processed request {body.id}")
