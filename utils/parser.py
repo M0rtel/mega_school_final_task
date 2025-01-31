@@ -9,7 +9,7 @@ def clean_html(raw_html: str) -> str:
   return re.sub(re.compile('<.*?>'), '', raw_html)
 
 
-async def async_get_context(question: str, num_sources: int = 2) -> tuple[str, list[str]]:
+async def async_get_context(question: str, num_sources: int = 3) -> tuple[str, list[str]]:
     """
     Выполняет поиск в Google и извлекает контекст из найденных страниц.
     :param question: Вопрос или ключевой запрос для поиска.
@@ -20,7 +20,7 @@ async def async_get_context(question: str, num_sources: int = 2) -> tuple[str, l
     # Выполняем поиск в Google и получаем список ссылок
     links = list(search(question, tld="co.in", num=num_sources, stop=num_sources, pause=0.2))
 
-    texts, final_links = [], []
+    texts = []
     for link in links:
         if "itmo" in link:  # Фильтруем только ссылки, содержащие "itmo"
             response = requests.get(link)  # Выполняем GET-запрос к найденной странице
@@ -28,4 +28,4 @@ async def async_get_context(question: str, num_sources: int = 2) -> tuple[str, l
 
             texts.append(clean_html(str(soup.find_all("p"))))
 
-    return " . ".join(texts), final_links
+    return " . ".join(texts), links
