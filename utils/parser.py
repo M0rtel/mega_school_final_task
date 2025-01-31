@@ -1,6 +1,12 @@
+import re
 import requests
+
 from bs4 import BeautifulSoup
 from googlesearch import search
+
+
+def clean_html(raw_html: str) -> str:
+  return re.sub(re.compile('<.*?>'), '', raw_html)
 
 
 async def async_get_context(question: str, num_sources: int = 2) -> tuple[str, list[str]]:
@@ -14,15 +20,12 @@ async def async_get_context(question: str, num_sources: int = 2) -> tuple[str, l
     # Выполняем поиск в Google и получаем список ссылок
     links = list(search(question, tld="co.in", num=num_sources, stop=num_sources, pause=0.2))
 
-    texts, right_links = [], []
+    texts, final_links = [], []
     for link in links:
         if "itmo" in link:  # Фильтруем только ссылки, содержащие "itmo"
             response = requests.get(link)  # Выполняем GET-запрос к найденной странице
             soup = BeautifulSoup(response.text, "html.parser")  # Разбираем HTML-код страницы
 
-            # Извлекаем текст из всех абзацев <p> и объединяем в одну строку
-            paragraphs = " ".join(p.get_text() for p in soup.find_all("p"))
-            texts.append(paragraphs)
-            right_links.append(link)
+            texts.append(clean_html(str(soup.find_all("p"))))
 
-    return " ".join(texts), right_links
+    return " . ".join(texts), final_links

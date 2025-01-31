@@ -1,4 +1,4 @@
-from typing import Union, Tuple
+from typing import Tuple
 
 from gigachat import GigaChat
 from utils.counts import QUERY_PROMPT, REASONING, PROMPT
@@ -26,7 +26,7 @@ async def async_request_to_gigachat(prompt: str) -> str:
     return response.choices[0].message.content
 
 
-async def async_get_answer(query: str, context: str) -> Tuple[Union[int, None], str]:
+async def async_get_answer(query: str, context: str) -> Tuple[int, str]:
     """
     Обрабатывает запрос пользователя и получает ответ от GigaChat.
     :param query: Входной запрос от пользователя.
@@ -37,7 +37,7 @@ async def async_get_answer(query: str, context: str) -> Tuple[Union[int, None], 
     prompt = (QUERY_PROMPT if is_multiline else PROMPT).format(query=query, context=context)
 
     response = await async_request_to_gigachat(prompt)  # Получаем ответ от GigaChat
-    answer = int("".join(filter(str.isdigit, response))) if is_multiline else None  # Извлекаем числовое значение из ответа, если применимо
+    answer = int("".join(filter(str.isdigit, response))) if is_multiline else -1  # Извлекаем числовое значение из ответа, если применимо
     reasoning = REASONING if is_multiline else response  # Определяем пояснение
 
     return answer, reasoning
